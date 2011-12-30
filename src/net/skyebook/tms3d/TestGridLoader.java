@@ -4,20 +4,25 @@
 package net.skyebook.tms3d;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.asset.AssetLocator;
+import com.jme3.asset.plugins.FileLocator;
+import com.jme3.bullet.BulletAppState;
 import com.jme3.light.DirectionalLight;
+import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.terrain.geomipmap.TerrainGrid;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.lodcalc.DistanceLodCalculator;
+import com.jme3.texture.Texture;
 
 /**
  * @author Skye Book
  *
  */
 public class TestGridLoader extends SimpleApplication {
-	
-	private TerrainGrid terrainGrid;
+
+	private TerrainGrid terrain;
 
 	/**
 	 * 
@@ -30,6 +35,8 @@ public class TestGridLoader extends SimpleApplication {
 	 */
 	@Override
 	public void simpleInitApp() {
+		assetManager.registerLocator("data/", FileLocator.class);
+		System.out.println("loaded");
 		// create lights
 		ColorRGBA diffuseLightColor = new ColorRGBA(1f, 1f, 1f, 1f);
 		ColorRGBA diffuseLightColor2 = new ColorRGBA(.3f,.4f,.45f,.3f);
@@ -44,18 +51,45 @@ public class TestGridLoader extends SimpleApplication {
 
 		rootNode.addLight(directionalLight);
 		rootNode.addLight(directionalLight2);
-		
-		flyCam.setMoveSpeed(100);
-		getCamera().setLocation(new Vector3f(0, 200, 0));
-		
-		terrainGrid = new TerrainGrid("Grid", 65, 257, new TMSGridTileLoader(assetManager));
-		
-		rootNode.attachChild(terrainGrid);
-		
-		TerrainLodControl control = new TerrainLodControl(terrainGrid, getCamera());
+
+		flyCam.setMoveSpeed(100f);
+		TMSGridTileLoader tms = new TMSGridTileLoader(assetManager);
+		tms.setPatchSize(129);
+		tms.setQuadSize(513);
+		terrain = new TerrainGrid("Grid", 129, 513, tms);
+
+		// create the Material for it to use
+		Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+
+		System.out.println("material created");
+		//material.setBoolean("UseMaterialColors", true);
+		//material.setColor("Diffuse", ColorRGBA.Red);
+		//material.setColor("Ambient", ColorRGBA.Red);
+		//material.setTexture("ColorMap", assetManager.loadTexture(TileUtils.generateTileRequest(tile)));
+		Texture texture = assetManager.loadTexture("12405.png");
+		System.out.println("texture loaded");
+		material.setTexture("ColorMap", texture);
+		terrain.setMaterial(material);
+
+		rootNode.attachChild(terrain);
+
+		TerrainLodControl control = new TerrainLodControl(terrain, getCamera());
 		control.setLodCalculator( new DistanceLodCalculator(65, 2.7f));
-		//terrainGrid.addControl(control);
-		
+		terrain.addControl(control);
+
+		final BulletAppState bulletAppState = new BulletAppState();
+		stateManager.attach(bulletAppState);
+
+		this.getCamera().setLocation(new Vector3f(0, 20, 0));
+
+		//this.viewPort.setBackgroundColor(new ColorRGBA(0.7f, 0.8f, 1f, 1f));
+
+	}
+
+
+	@Override
+	public void simpleUpdate(final float tpf) {
+		//System.out.println(cam.getLocation());
 	}
 
 	/**

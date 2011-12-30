@@ -18,6 +18,9 @@ import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.geomipmap.grid.FractalTileLoader;
 import com.jme3.terrain.heightmap.AbstractHeightMap;
 import com.jme3.terrain.heightmap.HillHeightMap;
+import com.jme3.terrain.heightmap.ImageBasedHeightMap;
+import com.jme3.texture.Texture;
+import com.jme3.texture.Texture.WrapMode;
 
 /**
  * @author Skye Book
@@ -26,24 +29,24 @@ import com.jme3.terrain.heightmap.HillHeightMap;
 public class TMSGridTileLoader implements TerrainGridTileLoader {
 
 	private AssetManager assetManager;
-	
+
 	private boolean debugMode = true;
 
 	private int patchSize = 5;
-	private int tileSize = 513;
+	private int tileSize = 257;
 	private FractalTileLoader.FloatBufferHeightMap heightMap;
 
-	private int zoom;
+	private int zoom = 15;
 
 	/**
 	 * 
 	 */
 	public TMSGridTileLoader(AssetManager assetManager) {
 		this.assetManager = assetManager;
-		
+
 		// register the tile server
-		assetManager.registerLocator("http://tile.openstreetmap.org/", UrlLocator.class);
-		
+		//assetManager.registerLocator("http://tile.openstreetmap.org/", UrlLocator.class);
+
 		System.out.println("TMSGridTileLoader created");
 	}
 
@@ -71,7 +74,7 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 	@Override
 	public TerrainQuad getTerrainQuadAt(Vector3f location) {
 		System.out.println("Requesting TerrainQuad for " + location.toString());
-		
+
 		// convert to real world coordinates
 		double lat = 40;
 		double lon = -74;
@@ -79,41 +82,65 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 		// convert coordinate to tile
 		Tile tile = TileUtils.generateTile(lat, lon, zoom);
 
+		System.out.println(TileUtils.generateTileRequest(tile));
+
 		TerrainQuad terrainQuad = null;
 
 		// check for debug mode
 		if(debugMode){
 			AbstractHeightMap debugHeightMap = null;
 			try {
-				debugHeightMap = new HillHeightMap(513, 1000, 50, 100, (byte) 10);
+				debugHeightMap = new HillHeightMap(tileSize, 1, 1, 50, (byte) 50);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-			
+
 			System.out.println("generating");
 
 			debugHeightMap.load();
-			
+
 			System.out.println("generated");
 
 			// create the TerrainQuad
 			terrainQuad = new TerrainQuad("Quad", patchSize, tileSize, debugHeightMap.getHeightMap());
-			
+
 			System.out.println("hello");
 		}
-		
-		System.out.println("about to laod texture");
 
-		// create the Material for it to use
-		Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		material.setColor("Color", ColorRGBA.Red);
-		//material.setTexture("ColorMap", assetManager.loadTexture(TileUtils.generateTileRequest(tile)));
-		terrainQuad.setMaterial(material);
-		
+		System.out.println("about to load texture");
+
+
+
 		System.out.println("texture loaded");
-		
+
 		// return the TerrainQuad
 		return terrainQuad;
+	}
+
+	private TerrainQuad createOther(){
+		Texture heightMapImage = assetManager.loadTexture("Textures/Terrain/splat/mountains512.png");
+		AbstractHeightMap heightmap = null;
+		try {
+			//heightmap = new HillHeightMap(1025, 1000, 50, 100, (byte) 3);
+
+			heightmap = new ImageBasedHeightMap(heightMapImage.getImage(), 1f);
+			heightmap.load();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		/*
+		 * Here we create the actual terrain. The tiles will be 65x65, and the total size of the
+		 * terrain will be 513x513. It uses the heightmap we created to generate the height values.
+		 */
+		/**
+		 * Optimal terrain patch size is 65 (64x64).
+		 * The total size is up to you. At 1025 it ran fine for me (200+FPS), however at
+		 * size=2049, it got really slow. But that is a jump from 2 million to 8 million triangles...
+		 */
+		TerrainQuad terrain = new TerrainQuad("terrain", patchSize, tileSize, heightmap.getHeightMap());
+		return terrain;
 	}
 
 	/* (non-Javadoc)
