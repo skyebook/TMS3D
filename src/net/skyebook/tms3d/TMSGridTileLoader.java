@@ -6,12 +6,8 @@ package net.skyebook.tms3d;
 import java.io.IOException;
 
 import com.jme3.asset.AssetManager;
-import com.jme3.asset.DesktopAssetManager;
-import com.jme3.asset.plugins.UrlLocator;
 import com.jme3.export.JmeExporter;
 import com.jme3.export.JmeImporter;
-import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.terrain.geomipmap.TerrainGridTileLoader;
 import com.jme3.terrain.geomipmap.TerrainQuad;
@@ -20,7 +16,6 @@ import com.jme3.terrain.heightmap.AbstractHeightMap;
 import com.jme3.terrain.heightmap.HillHeightMap;
 import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Texture;
-import com.jme3.texture.Texture.WrapMode;
 
 /**
  * @author Skye Book

@@ -60,12 +60,7 @@ public class TestGridLoader extends SimpleApplication {
 
 		// create the Material for it to use
 		Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-
 		System.out.println("material created");
-		//material.setBoolean("UseMaterialColors", true);
-		//material.setColor("Diffuse", ColorRGBA.Red);
-		//material.setColor("Ambient", ColorRGBA.Red);
-		//material.setTexture("ColorMap", assetManager.loadTexture(TileUtils.generateTileRequest(tile)));
 		Texture texture = assetManager.loadTexture("12405.png");
 		System.out.println("texture loaded");
 		material.setTexture("ColorMap", texture);
