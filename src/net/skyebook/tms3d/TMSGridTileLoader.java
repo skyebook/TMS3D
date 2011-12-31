@@ -3,10 +3,12 @@
  */
 package net.skyebook.tms3d;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import com.jme3.asset.AssetManager;
-import com.jme3.asset.plugins.UrlLocator;
+import com.jme3.asset.plugins.FileLocator;
 import com.jme3.export.JmeExporter;
 import com.jme3.export.JmeImporter;
 import com.jme3.material.Material;
@@ -16,7 +18,6 @@ import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.geomipmap.grid.FractalTileLoader;
 import com.jme3.terrain.heightmap.AbstractHeightMap;
 import com.jme3.terrain.heightmap.HillHeightMap;
-import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Texture;
 
 /**
@@ -25,28 +26,47 @@ import com.jme3.texture.Texture;
  */
 public class TMSGridTileLoader implements TerrainGridTileLoader {
 
+	private int startingX;
+	private int startingY;
+
 	private AssetManager assetManager;
 
 	private boolean debugMode = true;
 
-	private int patchSize = 5;
-	private int tileSize = 257;
+	private int patchSize = 65;
+	private int tileSize = 129;
 	private FractalTileLoader.FloatBufferHeightMap heightMap;
 
 	private int zoom = 15;
 
+	private File localTileCache;
+
+	int counter = 0;
+
 	/**
 	 * 
 	 */
-	public TMSGridTileLoader(AssetManager assetManager) {
+	public TMSGridTileLoader(AssetManager assetManager, int zoomLevel) {
 		this.assetManager = assetManager;
 
+		// convert to real world coordinates
+		double lat = 40.699667;
+		double lon = -74.014229;
+
+		// convert coordinate to tile
+		Tile tile = TileUtils.generateTile(lat, lon, zoom);
+		startingX=tile.getX();
+		startingY=tile.getY();
+
+		localTileCache = new File("tiles/");
+
 		// register the tile server
-		assetManager.registerLocator("http://tile.openstreetmap.org/", UrlLocator.class);
+		//assetManager.registerLocator("http://tile.openstreetmap.org/", UrlLocator.class);
+		assetManager.registerLocator("tiles/", FileLocator.class);
 
 		System.out.println("TMSGridTileLoader created");
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see com.jme3.export.Savable#write(com.jme3.export.JmeExporter)
 	 */
@@ -72,12 +92,12 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 	public TerrainQuad getTerrainQuadAt(Vector3f location) {
 		System.out.println("Requesting TerrainQuad for " + location.toString());
 
-		// convert to real world coordinates
-		double lat = 40;
-		double lon = -74;
-
-		// convert coordinate to tile
-		Tile tile = TileUtils.generateTile(lat, lon, zoom);
+		Tile tile = new Tile();
+		tile.setZoom(zoom);
+		//tile.setX(startingX+(((int)(location.getX()/tileSize))+location.getX()>0?1:-1));
+		//tile.setY(startingY+(((int)(location.getZ()/tileSize))+location.getZ()>0?1:-1));
+		tile.setX(startingX+(int)location.getX());
+		tile.setY(startingY+(int)location.getZ());
 
 
 		TerrainQuad terrainQuad = null;
@@ -90,26 +110,35 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-
-			System.out.println("generating");
-
 			debugHeightMap.load();
-
-			System.out.println("generated");
-
 			// create the TerrainQuad
-			terrainQuad = new TerrainQuad("Quad", patchSize, tileSize, debugHeightMap.getHeightMap());
-			
+			terrainQuad = new TerrainQuad(tile.getZoom()+"/"+tile.getX()+"/"+tile.getZoom(), patchSize, tileSize, debugHeightMap.getHeightMap());
+
 			// create the Material for it to use
 			Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 			System.out.println("material created");
+
+			// find file
+			File tileFile = new File(localTileCache.toString()+"/"+TileUtils.generateTileRequest(tile));
+			if(!tileFile.exists()){
+				try {
+					HTTPDownloader.download(new URL("http://tile.openstreetmap.org/"+TileUtils.generateTileRequest(tile)), tileFile, null, null);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			else{
+				System.out.println("TILE ALREADY EXISTS");
+			}
+
+
+
 			Texture texture = assetManager.loadTexture(TileUtils.generateTileRequest(tile));
 			System.out.println("texture loaded");
 			material.setTexture("ColorMap", texture);
 			terrainQuad.setMaterial(material);
 
 
-			System.out.println("hello");
 		}
 
 		System.out.println("about to load texture");
@@ -142,7 +171,7 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 	 * Sets the zoom level for this tile loader
 	 * @param zoom
 	 */
-	public void setZoom(int zoom){
+	private void setZoom(int zoom){
 		this.zoom = zoom;
 	}
 

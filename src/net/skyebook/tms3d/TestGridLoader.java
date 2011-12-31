@@ -4,18 +4,14 @@
 package net.skyebook.tms3d;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.asset.AssetLocator;
-import com.jme3.asset.plugins.FileLocator;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.light.DirectionalLight;
-import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.terrain.geomipmap.TerrainGrid;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.lodcalc.DistanceLodCalculator;
-import com.jme3.texture.Texture;
-
+  
 /**
  * @author Skye Book
  *
@@ -23,6 +19,7 @@ import com.jme3.texture.Texture;
 public class TestGridLoader extends SimpleApplication {
 
 	private TerrainGrid terrain;
+	private long last = -1;
 
 	/**
 	 * 
@@ -35,7 +32,9 @@ public class TestGridLoader extends SimpleApplication {
 	 */
 	@Override
 	public void simpleInitApp() {
-		assetManager.registerLocator("data/", FileLocator.class);
+		cam.setFrustumPerspective(45, cam.getWidth()/cam.getHeight(), 1f, 1000f);
+		
+		//assetManager.registerLocator("data/", FileLocator.class);
 		System.out.println("loaded");
 		// create lights
 		ColorRGBA diffuseLightColor = new ColorRGBA(1f, 1f, 1f, 1f);
@@ -52,11 +51,11 @@ public class TestGridLoader extends SimpleApplication {
 		rootNode.addLight(directionalLight);
 		rootNode.addLight(directionalLight2);
 
-		flyCam.setMoveSpeed(100f);
-		TMSGridTileLoader tms = new TMSGridTileLoader(assetManager);
+		flyCam.setMoveSpeed(1000f);
+		TMSGridTileLoader tms = new TMSGridTileLoader(assetManager, 12);
 		tms.setPatchSize(129);
 		tms.setQuadSize(513);
-		terrain = new TerrainGrid("Grid", 129, 513, tms);
+		terrain = new TerrainGrid("Grid", 129, 1025, tms);
 
 		
 		rootNode.attachChild(terrain);
@@ -77,7 +76,10 @@ public class TestGridLoader extends SimpleApplication {
 
 	@Override
 	public void simpleUpdate(final float tpf) {
-		//System.out.println(cam.getLocation());
+		if(System.currentTimeMillis()-last>1000){
+			System.out.println(cam.getLocation());
+			last = System.currentTimeMillis();
+		}
 	}
 
 	/**
