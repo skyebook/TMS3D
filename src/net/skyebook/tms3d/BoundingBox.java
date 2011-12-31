@@ -71,6 +71,15 @@ public class BoundingBox {
 		this.west = west;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "BoundingBox [north=" + north + ", south=" + south + ", east="
+				+ east + ", west=" + west + "]";
+	}
+	
 }
 
 

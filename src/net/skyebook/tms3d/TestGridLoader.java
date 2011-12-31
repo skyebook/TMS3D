@@ -8,8 +8,11 @@ import java.util.logging.Logger;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.light.DirectionalLight;
+import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.shape.Box;
 import com.jme3.terrain.geomipmap.TerrainGrid;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.lodcalc.DistanceLodCalculator;
@@ -22,6 +25,10 @@ public class TestGridLoader extends SimpleApplication {
 
 	private TerrainGrid terrain;
 	private long last = -1;
+	
+	private GLConverter converter;
+	
+	private Geometry groundBox;
 
 	/**
 	 * 
@@ -56,7 +63,9 @@ public class TestGridLoader extends SimpleApplication {
 		rootNode.addLight(directionalLight2);
 
 		flyCam.setMoveSpeed(1000f);
-		TMSGridTileLoader tms = new TMSGridTileLoader(assetManager, 9);
+		double lat = 40.699667;
+		double lon = -74.014229;
+		TMSGridTileLoader tms = new TMSGridTileLoader(assetManager, 9, lat, lon);
 		tms.setPatchSize(65);
 		tms.setQuadSize(257);
 		terrain = new TerrainGrid("Grid", 65, 1025, tms);
@@ -68,8 +77,18 @@ public class TestGridLoader extends SimpleApplication {
 		terrain.addControl(control);
 
 		this.getCamera().setLocation(new Vector3f(0, 20, 0));
+		
+		converter = new GLConverter(terrain, tms);
 
 		//this.viewPort.setBackgroundColor(new ColorRGBA(0.7f, 0.8f, 1f, 1f));
+		
+		Box groundBoxMesh = new Box(2, 2, 2);
+		groundBox = new Geometry("groundBox", groundBoxMesh);
+		Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		material.setColor("Color", ColorRGBA.Red);
+		groundBox.setMaterial(material);
+		rootNode.attachChild(groundBox);
+		
 
 	}
 
@@ -79,6 +98,11 @@ public class TestGridLoader extends SimpleApplication {
 		if(System.currentTimeMillis()-last>1000){
 			System.out.println(cam.getLocation());
 			last = System.currentTimeMillis();
+			
+			BoundingBox bb = converter.getPosition(cam.getLocation());
+			System.out.println("you are between "+bb.toString());
+			
+			groundBox.setLocalTranslation(cam.getLocation().x, 0, cam.getLocation().z);
 		}
 	}
 

@@ -48,13 +48,9 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 	/**
 	 * 
 	 */
-	public TMSGridTileLoader(AssetManager assetManager, int zoomLevel) {
+	public TMSGridTileLoader(AssetManager assetManager, int zoomLevel, double lat, double lon) {
 		this.assetManager = assetManager;
 		this.zoom=zoomLevel;
-
-		// convert to real world coordinates
-		double lat = 40.699667;
-		double lon = -74.014229;
 
 		// convert coordinate to tile
 		Tile tile = TileUtils.generateTile(lat, lon, zoom);
@@ -184,5 +180,26 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 	 */
 	private void setZoom(int zoom){
 		this.zoom = zoom;
+	}
+
+	/**
+	 * @return the x index of the starting tile
+	 */
+	public int getStartingX() {
+		return startingX;
+	}
+
+	/**
+	 * @return the y index of the starting tile
+	 */
+	public int getStartingY() {
+		return startingY;
+	}
+
+	/**
+	 * @return the zoom
+	 */
+	public int getZoom() {
+		return zoom;
 	}
 }
