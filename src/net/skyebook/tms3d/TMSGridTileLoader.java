@@ -6,8 +6,10 @@ package net.skyebook.tms3d;
 import java.io.IOException;
 
 import com.jme3.asset.AssetManager;
+import com.jme3.asset.plugins.UrlLocator;
 import com.jme3.export.JmeExporter;
 import com.jme3.export.JmeImporter;
+import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.terrain.geomipmap.TerrainGridTileLoader;
 import com.jme3.terrain.geomipmap.TerrainQuad;
@@ -40,7 +42,7 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 		this.assetManager = assetManager;
 
 		// register the tile server
-		//assetManager.registerLocator("http://tile.openstreetmap.org/", UrlLocator.class);
+		assetManager.registerLocator("http://tile.openstreetmap.org/", UrlLocator.class);
 
 		System.out.println("TMSGridTileLoader created");
 	}
@@ -98,6 +100,15 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 
 			// create the TerrainQuad
 			terrainQuad = new TerrainQuad("Quad", patchSize, tileSize, debugHeightMap.getHeightMap());
+			
+			// create the Material for it to use
+			Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+			System.out.println("material created");
+			Texture texture = assetManager.loadTexture("12405.png");
+			System.out.println("texture loaded");
+			material.setTexture("ColorMap", texture);
+			terrainQuad.setMaterial(material);
+
 
 			System.out.println("hello");
 		}
@@ -110,32 +121,6 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 
 		// return the TerrainQuad
 		return terrainQuad;
-	}
-
-	private TerrainQuad createOther(){
-		Texture heightMapImage = assetManager.loadTexture("Textures/Terrain/splat/mountains512.png");
-		AbstractHeightMap heightmap = null;
-		try {
-			//heightmap = new HillHeightMap(1025, 1000, 50, 100, (byte) 3);
-
-			heightmap = new ImageBasedHeightMap(heightMapImage.getImage(), 1f);
-			heightmap.load();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		/*
-		 * Here we create the actual terrain. The tiles will be 65x65, and the total size of the
-		 * terrain will be 513x513. It uses the heightmap we created to generate the height values.
-		 */
-		/**
-		 * Optimal terrain patch size is 65 (64x64).
-		 * The total size is up to you. At 1025 it ran fine for me (200+FPS), however at
-		 * size=2049, it got really slow. But that is a jump from 2 million to 8 million triangles...
-		 */
-		TerrainQuad terrain = new TerrainQuad("terrain", patchSize, tileSize, heightmap.getHeightMap());
-		return terrain;
 	}
 
 	/* (non-Javadoc)

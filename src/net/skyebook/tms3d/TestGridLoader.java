@@ -58,14 +58,7 @@ public class TestGridLoader extends SimpleApplication {
 		tms.setQuadSize(513);
 		terrain = new TerrainGrid("Grid", 129, 513, tms);
 
-		// create the Material for it to use
-		Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		System.out.println("material created");
-		Texture texture = assetManager.loadTexture("12405.png");
-		System.out.println("texture loaded");
-		material.setTexture("ColorMap", texture);
-		terrain.setMaterial(material);
-
+		
 		rootNode.attachChild(terrain);
 
 		TerrainLodControl control = new TerrainLodControl(terrain, getCamera());
