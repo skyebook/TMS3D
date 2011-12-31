@@ -99,8 +99,8 @@ public class TestGridLoader extends SimpleApplication {
 			System.out.println(cam.getLocation());
 			last = System.currentTimeMillis();
 			
-			BoundingBox bb = converter.getPosition(cam.getLocation());
-			System.out.println("you are between "+bb.toString());
+			double[] location = converter.getPosition(cam.getLocation());
+			System.out.println("you are at "+location[0]+", "+location[1]);
 			
 			groundBox.setLocalTranslation(cam.getLocation().x, 0, cam.getLocation().z);
 		}
