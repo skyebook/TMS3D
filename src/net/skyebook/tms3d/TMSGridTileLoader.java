@@ -79,7 +79,6 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 		// convert coordinate to tile
 		Tile tile = TileUtils.generateTile(lat, lon, zoom);
 
-		System.out.println(TileUtils.generateTileRequest(tile));
 
 		TerrainQuad terrainQuad = null;
 
@@ -104,7 +103,7 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 			// create the Material for it to use
 			Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 			System.out.println("material created");
-			Texture texture = assetManager.loadTexture("12405.png");
+			Texture texture = assetManager.loadTexture(TileUtils.generateTileRequest(tile));
 			System.out.println("texture loaded");
 			material.setTexture("ColorMap", texture);
 			terrainQuad.setMaterial(material);
