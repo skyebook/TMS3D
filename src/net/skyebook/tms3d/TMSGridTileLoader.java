@@ -67,7 +67,7 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 
 		System.out.println("TMSGridTileLoader created");
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see com.jme3.export.Savable#write(com.jme3.export.JmeExporter)
 	 */
@@ -115,38 +115,31 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 			// create the TerrainQuad
 			terrainQuad = new TerrainQuad(tile.getZoom()+"/"+tile.getX()+"/"+tile.getZoom(), patchSize, tileSize, debugHeightMap.getHeightMap());
 
-			// create the Material for it to use
-			Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-			System.out.println("material created");
-
-			// find file
-			File tileFile = new File(localTileCache.toString()+"/"+TileUtils.generateTileRequest(tile));
-			if(!tileFile.exists()){
-				try {
-					HTTPDownloader.download(new URL("http://tile.openstreetmap.org/"+TileUtils.generateTileRequest(tile)), tileFile, null, null);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			else{
-				System.out.println("TILE ALREADY EXISTS");
-			}
-
-
-
-			Texture texture = assetManager.loadTexture(TileUtils.generateTileRequest(tile));
-			System.out.println("texture loaded");
-			material.setTexture("ColorMap", texture);
-			terrainQuad.setMaterial(material);
-
-
 		}
 
-		System.out.println("about to load texture");
+		// create the Material for it to use
+		Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		System.out.println("material created");
+
+		// find file
+		File tileFile = new File(localTileCache.toString()+"/"+TileUtils.generateTileRequest(tile));
+		if(!tileFile.exists()){
+			try {
+				HTTPDownloader.download(new URL("http://tile.openstreetmap.org/"+TileUtils.generateTileRequest(tile)), tileFile, null, null);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		else{
+			System.out.println("TILE ALREADY EXISTS");
+		}
 
 
 
+		Texture texture = assetManager.loadTexture(TileUtils.generateTileRequest(tile));
 		System.out.println("texture loaded");
+		material.setTexture("ColorMap", texture);
+		terrainQuad.setMaterial(material);
 
 		// return the TerrainQuad
 		return terrainQuad;
