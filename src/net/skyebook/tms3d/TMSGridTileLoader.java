@@ -48,6 +48,7 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 	 */
 	public TMSGridTileLoader(AssetManager assetManager, int zoomLevel) {
 		this.assetManager = assetManager;
+		this.zoom=zoomLevel;
 
 		// convert to real world coordinates
 		double lat = 40.699667;

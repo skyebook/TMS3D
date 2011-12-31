@@ -32,7 +32,7 @@ public class TestGridLoader extends SimpleApplication {
 	 */
 	@Override
 	public void simpleInitApp() {
-		cam.setFrustumPerspective(45, cam.getWidth()/cam.getHeight(), 1f, 1000f);
+		cam.setFrustumPerspective(45, cam.getWidth()/cam.getHeight(), 1f, 10000);
 		
 		//assetManager.registerLocator("data/", FileLocator.class);
 		System.out.println("loaded");
@@ -52,10 +52,10 @@ public class TestGridLoader extends SimpleApplication {
 		rootNode.addLight(directionalLight2);
 
 		flyCam.setMoveSpeed(1000f);
-		TMSGridTileLoader tms = new TMSGridTileLoader(assetManager, 12);
-		tms.setPatchSize(129);
-		tms.setQuadSize(513);
-		terrain = new TerrainGrid("Grid", 129, 1025, tms);
+		TMSGridTileLoader tms = new TMSGridTileLoader(assetManager, 5);
+		tms.setPatchSize(65);
+		tms.setQuadSize(257);
+		terrain = new TerrainGrid("Grid", 257, 2049, tms);
 
 		
 		rootNode.attachChild(terrain);
@@ -63,9 +63,6 @@ public class TestGridLoader extends SimpleApplication {
 		TerrainLodControl control = new TerrainLodControl(terrain, getCamera());
 		control.setLodCalculator( new DistanceLodCalculator(65, 2.7f));
 		terrain.addControl(control);
-
-		final BulletAppState bulletAppState = new BulletAppState();
-		stateManager.attach(bulletAppState);
 
 		this.getCamera().setLocation(new Vector3f(0, 20, 0));
 
