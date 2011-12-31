@@ -6,6 +6,7 @@ package net.skyebook.tms3d;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.FloatBuffer;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.plugins.FileLocator;
@@ -16,9 +17,11 @@ import com.jme3.math.Vector3f;
 import com.jme3.terrain.geomipmap.TerrainGridTileLoader;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.geomipmap.grid.FractalTileLoader;
+import com.jme3.terrain.geomipmap.grid.FractalTileLoader.FloatBufferHeightMap;
 import com.jme3.terrain.heightmap.AbstractHeightMap;
 import com.jme3.terrain.heightmap.HillHeightMap;
 import com.jme3.texture.Texture;
+import com.jme3.util.BufferUtils;
 
 /**
  * @author Skye Book
@@ -34,7 +37,7 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 	private boolean debugMode = true;
 
 	private int patchSize = 65;
-	private int tileSize = 129;
+	private int tileSize = 257;
 	private FractalTileLoader.FloatBufferHeightMap heightMap;
 
 	private int zoom = 15;
@@ -106,15 +109,25 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 		// check for debug mode
 		if(debugMode){
 			AbstractHeightMap debugHeightMap = null;
+			/*
+			FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(257*257);
+			for(int i=0; i<(tileSize*tileSize); i++){
+				floatBuffer.put(0);
+			}
+			*/
 			try {
 				debugHeightMap = new HillHeightMap(tileSize, 1, 1, 50, (byte) 50);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
 			debugHeightMap.load();
+			System.out.println(debugHeightMap.getHeightMap().length+" values");
 			// create the TerrainQuad
-			terrainQuad = new TerrainQuad(tile.getZoom()+"/"+tile.getX()+"/"+tile.getZoom(), patchSize, tileSize, debugHeightMap.getHeightMap());
+			terrainQuad = new TerrainQuad(tile.getZoom()+"/"+tile.getX()+"/"+tile.getZoom(), patchSize, tileSize, heightMap.getHeightMap());
 
+		}
+		else{
+			// create the terrain
 		}
 
 		// create the Material for it to use

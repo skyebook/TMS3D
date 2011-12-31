@@ -51,11 +51,10 @@ public class TestGridLoader extends SimpleApplication {
 		rootNode.addLight(directionalLight2);
 
 		flyCam.setMoveSpeed(1000f);
-		TMSGridTileLoader tms = new TMSGridTileLoader(assetManager, 5);
+		TMSGridTileLoader tms = new TMSGridTileLoader(assetManager, 9);
 		tms.setPatchSize(65);
 		tms.setQuadSize(257);
-		terrain = new TerrainGrid("Grid", 257, 2049, tms);
-
+		terrain = new TerrainGrid("Grid", 65, 2049, tms);
 		
 		rootNode.attachChild(terrain);
 
