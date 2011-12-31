@@ -3,6 +3,9 @@
  */
 package net.skyebook.tms3d;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.jme3.app.SimpleApplication;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
@@ -33,6 +36,8 @@ public class TestGridLoader extends SimpleApplication {
 	public void simpleInitApp() {
 		cam.setFrustumPerspective(45, cam.getWidth()/cam.getHeight(), 1f, 10000);
 		
+		Logger.getLogger("com.jme").setLevel(Level.OFF);
+		
 		//assetManager.registerLocator("data/", FileLocator.class);
 		System.out.println("loaded");
 		// create lights
@@ -54,7 +59,7 @@ public class TestGridLoader extends SimpleApplication {
 		TMSGridTileLoader tms = new TMSGridTileLoader(assetManager, 9);
 		tms.setPatchSize(65);
 		tms.setQuadSize(257);
-		terrain = new TerrainGrid("Grid", 65, 2049, tms);
+		terrain = new TerrainGrid("Grid", 65, 1025, tms);
 		
 		rootNode.attachChild(terrain);
 

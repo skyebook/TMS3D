@@ -20,6 +20,7 @@ import com.jme3.terrain.geomipmap.grid.FractalTileLoader;
 import com.jme3.terrain.geomipmap.grid.FractalTileLoader.FloatBufferHeightMap;
 import com.jme3.terrain.heightmap.AbstractHeightMap;
 import com.jme3.terrain.heightmap.HillHeightMap;
+import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Texture;
 import com.jme3.util.BufferUtils;
 
@@ -33,8 +34,6 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 	private int startingY;
 
 	private AssetManager assetManager;
-
-	private boolean debugMode = true;
 
 	private int patchSize = 65;
 	private int tileSize = 257;
@@ -63,9 +62,9 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 		startingY=tile.getY();
 
 		localTileCache = new File("tiles/");
+		localTileCache.mkdirs();
 
 		// register the tile server
-		//assetManager.registerLocator("http://tile.openstreetmap.org/", UrlLocator.class);
 		assetManager.registerLocator("tiles/", FileLocator.class);
 
 		System.out.println("TMSGridTileLoader created");
@@ -104,31 +103,18 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 		tile.setY(startingY+(int)location.getZ());
 
 
-		TerrainQuad terrainQuad = null;
-
-		// check for debug mode
-		if(debugMode){
-			AbstractHeightMap debugHeightMap = null;
-			/*
-			FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(257*257);
-			for(int i=0; i<(tileSize*tileSize); i++){
-				floatBuffer.put(0);
-			}
-			*/
-			try {
-				debugHeightMap = new HillHeightMap(tileSize, 1, 1, 50, (byte) 50);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-			debugHeightMap.load();
-			System.out.println(debugHeightMap.getHeightMap().length+" values");
-			// create the TerrainQuad
-			terrainQuad = new TerrainQuad(tile.getZoom()+"/"+tile.getX()+"/"+tile.getZoom(), patchSize, tileSize, heightMap.getHeightMap());
-
+		AbstractHeightMap debugHeightMap = null;
+		try {
+			debugHeightMap = new HillHeightMap(tileSize, 1, 1, 50, (byte) 50);
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
-		else{
-			// create the terrain
-		}
+		debugHeightMap.load();
+		//System.out.println(debugHeightMap.getHeightMap().length+" values");
+		// create the TerrainQuad
+		TerrainQuad terrainQuad = new TerrainQuad(tile.getZoom()+"/"+tile.getX()+"/"+tile.getZoom(), patchSize, tileSize, debugHeightMap.getHeightMap());
+
+		System.out.println("terrain quad created");
 
 		// create the Material for it to use
 		Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
@@ -138,6 +124,7 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 		File tileFile = new File(localTileCache.toString()+"/"+TileUtils.generateTileRequest(tile));
 		if(!tileFile.exists()){
 			try {
+				System.out.println("downloading terrain");
 				HTTPDownloader.download(new URL("http://tile.openstreetmap.org/"+TileUtils.generateTileRequest(tile)), tileFile, null, null);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -174,12 +161,28 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 		this.tileSize = quadSize;
 	}
 
+
+
 	/**
+	 * @return the size of patches within the underlying TerrainQuads
+	 */
+	public int getPatchSize() {
+		return patchSize;
+	}
+
+	/**
+	 * @return the size of the underlying TerrainQuads
+	 */
+	public int getQuadSize() {
+		return tileSize;
+	}
+
+	/**
+	 * Not safe to use this yet.  Keep private until it is ready.
 	 * Sets the zoom level for this tile loader
 	 * @param zoom
 	 */
 	private void setZoom(int zoom){
 		this.zoom = zoom;
 	}
-
 }
