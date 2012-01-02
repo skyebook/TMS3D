@@ -6,7 +6,6 @@ package net.skyebook.tms3d;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.FloatBuffer;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.plugins.FileLocator;
@@ -16,13 +15,9 @@ import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.terrain.geomipmap.TerrainGridTileLoader;
 import com.jme3.terrain.geomipmap.TerrainQuad;
-import com.jme3.terrain.geomipmap.grid.FractalTileLoader;
-import com.jme3.terrain.geomipmap.grid.FractalTileLoader.FloatBufferHeightMap;
 import com.jme3.terrain.heightmap.AbstractHeightMap;
 import com.jme3.terrain.heightmap.HillHeightMap;
-import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Texture;
-import com.jme3.util.BufferUtils;
 
 /**
  * @author Skye Book
@@ -37,12 +32,10 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 
 	private int patchSize = 65;
 	private int tileSize = 257;
-	private FractalTileLoader.FloatBufferHeightMap heightMap;
-
-	private int zoom = 15;
+	private int zoom;
 
 	private File localTileCache;
-
+	
 	int counter = 0;
 
 	/**
@@ -59,7 +52,7 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 
 		localTileCache = new File("tiles/");
 		localTileCache.mkdirs();
-
+		
 		// register the tile server
 		assetManager.registerLocator("tiles/", FileLocator.class);
 
@@ -106,9 +99,9 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 			ex.printStackTrace();
 		}
 		debugHeightMap.load();
-		//System.out.println(debugHeightMap.getHeightMap().length+" values");
 		// create the TerrainQuad
 		TerrainQuad terrainQuad = new TerrainQuad(tile.getZoom()+"/"+tile.getX()+"/"+tile.getZoom(), patchSize, tileSize, debugHeightMap.getHeightMap());
+		terrainQuad.setLocked(true);
 
 		System.out.println("terrain quad created");
 
@@ -117,11 +110,11 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 		System.out.println("material created");
 
 		// find file
-		File tileFile = new File(localTileCache.toString()+"/"+TileUtils.generateCachePath(TileUtils.OSM_KEY, tile));
+		File tileFile = new File(localTileCache.toString()+"/"+TileUtils.generateCachePath(TileUtils.GOOGLE_KEY, tile));
 		if(!tileFile.exists()){
 			try {
 				System.out.println("downloading tile");
-				HTTPDownloader.download(new URL(TileUtils.generateOSMTileRequest(tile)), tileFile, null, null);
+				HTTPDownloader.download(new URL(TileUtils.generateGoogleTileRequest(tile)), tileFile, null, null);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -132,10 +125,12 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 
 
 
-		Texture texture = assetManager.loadTexture(TileUtils.generateCachePath(TileUtils.OSM_KEY, tile));
+		Texture texture = assetManager.loadTexture(TileUtils.generateCachePath(TileUtils.GOOGLE_KEY, tile));
 		System.out.println("texture loaded");
 		material.setTexture("ColorMap", texture);
 		terrainQuad.setMaterial(material);
+		
+		System.gc();
 
 		// return the TerrainQuad
 		return terrainQuad;
