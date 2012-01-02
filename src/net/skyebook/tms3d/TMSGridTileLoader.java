@@ -117,22 +117,22 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 		System.out.println("material created");
 
 		// find file
-		File tileFile = new File(localTileCache.toString()+"/"+TileUtils.generateCachePath(TileUtils.GOOGLE_KEY, tile));
+		File tileFile = new File(localTileCache.toString()+"/"+TileUtils.generateCachePath(TileUtils.OSM_KEY, tile));
 		if(!tileFile.exists()){
 			try {
-				System.out.println("downloading terrain");
-				HTTPDownloader.download(new URL(TileUtils.generateGoogleTileRequest(tile)), tileFile, null, null);
+				System.out.println("downloading tile");
+				HTTPDownloader.download(new URL(TileUtils.generateOSMTileRequest(tile)), tileFile, null, null);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 		else{
-			System.out.println("TILE ALREADY EXISTS");
+			//System.out.println("TILE ALREADY EXISTS");
 		}
 
 
 
-		Texture texture = assetManager.loadTexture(TileUtils.generateCachePath(TileUtils.GOOGLE_KEY, tile));
+		Texture texture = assetManager.loadTexture(TileUtils.generateCachePath(TileUtils.OSM_KEY, tile));
 		System.out.println("texture loaded");
 		material.setTexture("ColorMap", texture);
 		terrainQuad.setMaterial(material);

@@ -43,7 +43,7 @@ public class TestGridLoader extends SimpleApplication {
 	public void simpleInitApp() {
 		cam.setFrustumPerspective(45, (float)cam.getWidth()/cam.getHeight(), 1f, 10000);
 		
-		Logger.getLogger("com.jme").setLevel(Level.OFF);
+		Logger.getLogger("com.jme3").setLevel(Level.SEVERE);
 		
 		//assetManager.registerLocator("data/", FileLocator.class);
 		System.out.println("loaded");
