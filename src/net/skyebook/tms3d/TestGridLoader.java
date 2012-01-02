@@ -41,7 +41,7 @@ public class TestGridLoader extends SimpleApplication {
 	 */
 	@Override
 	public void simpleInitApp() {
-		cam.setFrustumPerspective(45, cam.getWidth()/cam.getHeight(), 1f, 10000);
+		cam.setFrustumPerspective(45, (float)cam.getWidth()/cam.getHeight(), 1f, 10000);
 		
 		Logger.getLogger("com.jme").setLevel(Level.OFF);
 		

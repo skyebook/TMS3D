@@ -38,7 +38,13 @@ public class TileUtils {
 	}
 	
 	public static String generateCachePath(String serverKey, Tile tile){
-		return serverKey+"/"+tile.getZoom() + "/" + tile.getX() + "/" + tile.getY() + ".png";
+		if(serverKey==OSM_KEY){
+			return serverKey+"/"+tile.getZoom() + "/" + tile.getX() + "/" + tile.getY() + ".png";
+		}
+		else if(serverKey==GOOGLE_KEY){
+			return serverKey+"/"+tile.getZoom() + "/" + tile.getX() + "/" + tile.getY() + ".jpeg";
+		}
+		else throw new IllegalArgumentException("Registered Server Key Required");
 	}
 
 	public static String generateOSMTileRequest(Tile tile) {
