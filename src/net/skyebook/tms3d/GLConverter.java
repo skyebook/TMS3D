@@ -41,8 +41,7 @@ public class GLConverter {
 			
 			@Override
 			public void gridMoved(Vector3f newCenter) {
-				// TODO Auto-generated method stub
-				
+				System.out.println("Grid Moved: " + newCenter.toString());
 			}
 		});
 		

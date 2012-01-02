@@ -10,6 +10,9 @@ package net.skyebook.tms3d;
  *
  */
 public class TileUtils {
+	
+	public static final String GOOGLE_KEY = "Google";
+	public static final String OSM_KEY = "OpenStreetMap";
 
 	public static BoundingBox tile2boundingBox(Tile tile) {
 		BoundingBox bb = new BoundingBox();
@@ -29,15 +32,17 @@ public class TileUtils {
 		return Math.toDegrees(Math.atan(Math.sinh(n)));
 	}
 	
-	public static String generateTileRequest(String baseServer, Tile tile) {
-		if(!baseServer.endsWith("/")) baseServer = baseServer+"/";
-		
-		return baseServer + generateTileRequest(tile);
+	public static String generateGoogleTileRequest(Tile tile){
+		// http://khm1.google.com/kh/v=101&x=1741&y=779&z=11
+		return "http://khm1.google.com/kh/v=101&x="+tile.getX()+"&y="+tile.getY()+"&z="+tile.getZoom();
+	}
+	
+	public static String generateCachePath(String serverKey, Tile tile){
+		return serverKey+"/"+tile.getZoom() + "/" + tile.getX() + "/" + tile.getY() + ".png";
 	}
 
-	public static String generateTileRequest(Tile tile) {
-		
-		return tile.getZoom() + "/" + tile.getX() + "/" + tile.getY() + ".png";
+	public static String generateOSMTileRequest(Tile tile) {
+		return "http://tile.openstreetmap.org/"+tile.getZoom() + "/" + tile.getX() + "/" + tile.getY() + ".png";
 	}
 
 	public static Tile generateTile(double lat, double lon, int zoom) {
@@ -46,12 +51,5 @@ public class TileUtils {
 		tile.setY((int)Math.floor( (1 - Math.log(Math.tan(Math.toRadians(lat)) + 1 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2 * (1<<zoom)));
 		tile.setZoom(zoom);
 		return tile;
-	}
-	
-	public static void main(String[] args){
-		// test
-		String baseServer = "http://tile.openstreetmap.org/";
-		Tile tile = generateTile(40.68, -73.7, 15);
-		System.out.println(generateTileRequest(baseServer, tile));
 	}
 }
