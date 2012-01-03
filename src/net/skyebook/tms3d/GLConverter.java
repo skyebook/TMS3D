@@ -62,16 +62,20 @@ public class GLConverter {
 
 		this.tms = tileLoader;
 
-		originX = tms.getStartingX()-terrainCenterX;
-		originY = tms.getStartingY()-terrainCenterY;
+		originX = tms.getStartingX();//-terrainCenterX;
+		originY = tms.getStartingY();//-terrainCenterY;
 		zoom = tms.getZoom();
 	}
 
 	public double[] getPosition(Vector3f location){
 		int usableQuadSize = tms.getQuadSize()-1;
+		
+		Vector3f usableLocation = location.clone();
+		usableLocation.x+=usableQuadSize;
+		usableLocation.z+=usableQuadSize;
 
-		int cellX = (int)FastMath.floor(location.x/usableQuadSize);
-		int cellY = (int)FastMath.floor(location.z/usableQuadSize);
+		int cellX = (int)FastMath.floor(usableLocation.x/usableQuadSize);
+		int cellY = (int)FastMath.floor(usableLocation.z/usableQuadSize);
 
 		// increment both of the cells
 		//cellX+=1;
@@ -82,7 +86,7 @@ public class GLConverter {
 		float startX = cellX*usableQuadSize;
 		float startY = cellY*usableQuadSize;
 
-		System.out.println("CAMERA AT "+location);
+		System.out.println("CAMERA AT "+usableLocation);
 		System.out.println("TILE AT "+startX+", "+startY);
 
 		float endX = startX + usableQuadSize;
@@ -96,8 +100,8 @@ public class GLConverter {
 		endBox.setLocalTranslation(endX, 0, endY);
 
 		// localize it
-		float localX = location.x - startX;
-		float localY = location.z - startY;
+		float localX = usableLocation.x - startX;
+		float localY = usableLocation.z - startY;
 
 		float percentX = localX/(float)usableQuadSize;
 		float percentY = localY/(float)usableQuadSize;
@@ -111,6 +115,8 @@ public class GLConverter {
 		tile.setX(originX+cellX);
 		tile.setY(originY+cellY);
 		tile.setZoom(zoom);
+		
+		System.out.println("tile is " + tile.getX()+","+tile.getY());
 
 		BoundingBox tileBoundingBox = TileUtils.tile2boundingBox(tile);
 
