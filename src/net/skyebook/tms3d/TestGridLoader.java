@@ -79,17 +79,28 @@ public class TestGridLoader extends SimpleApplication {
 
 		this.getCamera().setLocation(new Vector3f(0, 20, 0));
 		
-		converter = new GLConverter(terrain, tms);
-
 		//this.viewPort.setBackgroundColor(new ColorRGBA(0.7f, 0.8f, 1f, 1f));
 		
-		Box groundBoxMesh = new Box(2, 2, 2);
-		groundBox = new Geometry("groundBox", groundBoxMesh);
+		Box boxMesh = new Box(2, 2, 2);
+		groundBox = new Geometry("groundBox", boxMesh);
 		Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 		material.setColor("Color", ColorRGBA.Red);
 		groundBox.setMaterial(material);
 		rootNode.attachChild(groundBox);
 		
+		Geometry startBox = new Geometry("startBox", boxMesh);
+		Material startMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		startMat.setColor("Color", ColorRGBA.Green);
+		startBox.setMaterial(startMat);
+		rootNode.attachChild(startBox);
+		
+		Geometry endBox = new Geometry("endBox", boxMesh);
+		Material endMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		endMat.setColor("Color", ColorRGBA.Blue);
+		endBox.setMaterial(endMat);
+		rootNode.attachChild(endBox);
+		
+		converter = new GLConverter(terrain, tms, startBox, endBox);
 
 	}
 
