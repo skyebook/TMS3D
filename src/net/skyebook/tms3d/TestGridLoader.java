@@ -34,8 +34,7 @@ public class TestGridLoader extends SimpleApplication {
 	/**
 	 * 
 	 */
-	public TestGridLoader() {
-	}
+	public TestGridLoader() {}
 
 	/* (non-Javadoc)
 	 * @see com.jme3.app.SimpleApplication#simpleInitApp()
