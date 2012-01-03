@@ -90,9 +90,9 @@ public class GLConverter {
 		float endX = startX + usableQuadSize;
 		float endY = startY + usableQuadSize;
 
-		System.out.println("CAMERA AT\t"+usableLocation.z+"\t"+usableLocation.z);
+		System.out.println("CAMERA AT\t"+usableLocation.x+"\t"+usableLocation.z);
 
-		System.out.println("TILE Extents\t("+startX+","+endX+")\t"+startY+","+endY+")");
+		System.out.println("TILE Extents\t("+startX+","+endX+")\t("+startY+","+endY+")");
 
 		System.out.println("endX: " + endX);
 
@@ -107,6 +107,8 @@ public class GLConverter {
 
 		float percentX = localX/(float)usableQuadSize;
 		float percentY = localY/(float)usableQuadSize;
+		// flip the polarity of the Y-tile
+		percentY = 1f-percentY;
 
 		//percentX*=-1;
 		//percentY*=-1;
