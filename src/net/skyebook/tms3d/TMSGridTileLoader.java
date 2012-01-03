@@ -15,8 +15,6 @@ import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.terrain.geomipmap.TerrainGridTileLoader;
 import com.jme3.terrain.geomipmap.TerrainQuad;
-import com.jme3.terrain.heightmap.AbstractHeightMap;
-import com.jme3.terrain.heightmap.HillHeightMap;
 import com.jme3.texture.Texture;
 
 /**
@@ -89,19 +87,8 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 		tile.setX(startingX+(int)location.getX());
 		tile.setY(startingY+(int)location.getZ());
 
-
-		AbstractHeightMap debugHeightMap = null;
-		try {
-			//debugHeightMap = new HillHeightMap(tileSize, 1, 1, 50, (byte) 50);
-			debugHeightMap = new EmptyHeightMap(getQuadSize());
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		debugHeightMap.load();
-		
-		
 		// create the TerrainQuad
-		TerrainQuad terrainQuad = new TerrainQuad(tile.getZoom()+"/"+tile.getX()+"/"+tile.getZoom(), patchSize, tileSize, debugHeightMap.getHeightMap());
+		TerrainQuad terrainQuad = new TerrainQuad(tile.getZoom()+"/"+tile.getX()+"/"+tile.getZoom(), patchSize, tileSize, null);
 		terrainQuad.setLocked(true);
 
 		//System.out.println("terrain quad created");
