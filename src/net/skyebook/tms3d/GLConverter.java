@@ -69,7 +69,8 @@ public class GLConverter {
 
 	public double[] getPosition(Vector3f location){
 		int usableQuadSize = tms.getQuadSize()-1;
-		
+
+		// The camera's location needs to be offset by the size of a TerrainQuad within the grid
 		Vector3f usableLocation = location.clone();
 		usableLocation.x+=usableQuadSize;
 		usableLocation.z+=usableQuadSize;
@@ -81,16 +82,17 @@ public class GLConverter {
 		//cellX+=1;
 		//cellY+=1;
 
-		System.out.println("Looks like you're in: " + cellX+", "+cellY);
+		System.out.println("Camera is over Cell:\tx:" + cellX+"\ty:"+cellY);
 
 		float startX = cellX*usableQuadSize;
 		float startY = cellY*usableQuadSize;
 
-		System.out.println("CAMERA AT "+usableLocation);
-		System.out.println("TILE AT "+startX+", "+startY);
-
 		float endX = startX + usableQuadSize;
 		float endY = startY + usableQuadSize;
+
+		System.out.println("CAMERA AT\t"+usableLocation.z+"\t"+usableLocation.z);
+
+		System.out.println("TILE Extents\t("+startX+","+endX+")\t"+startY+","+endY+")");
 
 		System.out.println("endX: " + endX);
 
@@ -115,7 +117,7 @@ public class GLConverter {
 		tile.setX(originX+cellX);
 		tile.setY(originY+cellY);
 		tile.setZoom(zoom);
-		
+
 		System.out.println("tile is " + tile.getX()+","+tile.getY());
 
 		BoundingBox tileBoundingBox = TileUtils.tile2boundingBox(tile);
