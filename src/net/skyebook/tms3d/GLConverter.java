@@ -3,6 +3,8 @@
  */
 package net.skyebook.tms3d;
 
+import java.util.logging.Logger;
+
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -15,15 +17,14 @@ import com.jme3.terrain.geomipmap.TerrainQuad;
  *
  */
 public class GLConverter {
-
-	// the terrains current grid center
-	private int terrainCenterX;
-	private int terrainCenterY;
+	
+	Logger logger = Logger.getLogger(GLConverter.class.getName());
 
 	// The x index of the tile at the OpenGL origin
 	private int originX;
 	// The x index of the tile at the OpenGL origin
 	private int originY;
+	// The level of zoom in the TMS grid
 	private int zoom;
 
 	private TerrainGrid terrain;
@@ -37,10 +38,6 @@ public class GLConverter {
 		this.startBox = startBox;
 		this.endBox = endBox;
 
-		Vector3f currentGrid = terrain.getCurrentCell();
-		terrainCenterX = (int)currentGrid.x;
-		terrainCenterY = (int)currentGrid.z;
-
 		this.terrain.addListener(new TerrainGridListener() {
 
 			@Override
@@ -51,19 +48,14 @@ public class GLConverter {
 
 			@Override
 			public void gridMoved(Vector3f newCenter) {
-				System.out.println("Grid Moved: " + newCenter);
-				terrainCenterX = (int)newCenter.x;
-				terrainCenterY = (int)newCenter.z;
-
-				//originX = tms.getStartingX()-terrainCenterX;
-				//originY = tms.getStartingY()-terrainCenterY;
+				//logger.fine("Grid Moved: " + newCenter);
 			}
 		});
 
 		this.tms = tileLoader;
 
-		originX = tms.getStartingX();//-terrainCenterX;
-		originY = tms.getStartingY();//-terrainCenterY;
+		originX = tms.getStartingX();
+		originY = tms.getStartingY();
 		zoom = tms.getZoom();
 	}
 
@@ -78,11 +70,7 @@ public class GLConverter {
 		int cellX = (int)FastMath.floor(usableLocation.x/usableQuadSize);
 		int cellY = (int)FastMath.floor(usableLocation.z/usableQuadSize);
 
-		// increment both of the cells
-		//cellX+=1;
-		//cellY+=1;
-
-		System.out.println("Camera is over Cell:\tx:" + cellX+"\ty:"+cellY);
+		logger.fine("Camera is over Cell:\tx:" + cellX+"\ty:"+cellY);
 
 		float startX = cellX*usableQuadSize;
 		float startY = cellY*usableQuadSize;
@@ -90,13 +78,9 @@ public class GLConverter {
 		float endX = startX + usableQuadSize;
 		float endY = startY + usableQuadSize;
 
-		System.out.println("CAMERA AT\t"+usableLocation.x+"\t"+usableLocation.z);
+		logger.fine("CAMERA AT\t"+usableLocation.x+"\t"+usableLocation.z);
 
-		System.out.println("TILE Extents\t("+startX+","+endX+")\t("+startY+","+endY+")");
-
-		System.out.println("endX: " + endX);
-
-		//System.out.println("GL Stride: "+(endX-startX)+", "+(endY-startY));
+		logger.fine("TILE Extents\t("+startX+","+endX+")\t("+startY+","+endY+")");
 
 		startBox.setLocalTranslation(startX, 0, startY);
 		endBox.setLocalTranslation(endX, 0, endY);
@@ -110,27 +94,24 @@ public class GLConverter {
 		// flip the polarity of the Y-tile
 		percentY = 1f-percentY;
 
-		//percentX*=-1;
-		//percentY*=-1;
-
-		System.out.println("Camera is "  + percentX + " of X and " + percentY + " of Y");
+		logger.fine("Camera is "  + percentX + " of X and " + percentY + " of Y");
 
 		Tile tile = new Tile();
 		tile.setX(originX+cellX);
 		tile.setY(originY+cellY);
 		tile.setZoom(zoom);
 
-		System.out.println("tile is " + tile.getX()+","+tile.getY());
+		logger.fine("tile is " + tile.getX()+","+tile.getY());
 
 		BoundingBox tileBoundingBox = TileUtils.tile2boundingBox(tile);
 
-		System.out.println("Inside of " + tileBoundingBox);
+		logger.fine("Inside of " + tileBoundingBox);
 
 		double latStride = tileBoundingBox.getNorth()-tileBoundingBox.getSouth();
 		double lonStride = tileBoundingBox.getEast()-tileBoundingBox.getWest();
 
-		System.out.println("latStride\t"+latStride);
-		System.out.println("lonStride\t"+lonStride);
+		logger.fine("latStride\t"+latStride);
+		logger.fine("lonStride\t"+lonStride);
 
 		double lat = tileBoundingBox.getSouth()+(latStride*percentY);
 		double lon = tileBoundingBox.getWest()+(lonStride*percentX);
