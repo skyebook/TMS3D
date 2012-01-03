@@ -92,11 +92,14 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 
 		AbstractHeightMap debugHeightMap = null;
 		try {
-			debugHeightMap = new HillHeightMap(tileSize, 1, 1, 50, (byte) 50);
+			//debugHeightMap = new HillHeightMap(tileSize, 1, 1, 50, (byte) 50);
+			debugHeightMap = new EmptyHeightMap(getQuadSize());
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		debugHeightMap.load();
+		
+		
 		// create the TerrainQuad
 		TerrainQuad terrainQuad = new TerrainQuad(tile.getZoom()+"/"+tile.getX()+"/"+tile.getZoom(), patchSize, tileSize, debugHeightMap.getHeightMap());
 		terrainQuad.setLocked(true);

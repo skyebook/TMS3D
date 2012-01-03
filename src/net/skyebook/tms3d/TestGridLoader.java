@@ -97,13 +97,14 @@ public class TestGridLoader extends SimpleApplication {
 	@Override
 	public void simpleUpdate(final float tpf) {
 		if(System.currentTimeMillis()-last>1000){
-			System.out.println(cam.getLocation());
-			last = System.currentTimeMillis();
-			
+			System.out.println("--\tSTART CONVERSION\t--");
 			double[] location = converter.getPosition(cam.getLocation());
 			System.out.println("you are at "+location[0]+", "+location[1]);
 			
 			groundBox.setLocalTranslation(cam.getLocation().x, 0, cam.getLocation().z);
+			
+			last = System.currentTimeMillis();
+			System.out.println("--\tEND CONVERSION\t--");
 		}
 	}
 
