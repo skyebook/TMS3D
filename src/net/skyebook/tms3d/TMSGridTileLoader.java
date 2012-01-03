@@ -55,8 +55,6 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 		
 		// register the tile server
 		assetManager.registerLocator("tiles/", FileLocator.class);
-
-		System.out.println("TMSGridTileLoader created");
 	}
 
 	/* (non-Javadoc)
@@ -103,18 +101,18 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 		TerrainQuad terrainQuad = new TerrainQuad(tile.getZoom()+"/"+tile.getX()+"/"+tile.getZoom(), patchSize, tileSize, debugHeightMap.getHeightMap());
 		terrainQuad.setLocked(true);
 
-		System.out.println("terrain quad created");
+		//System.out.println("terrain quad created");
 
 		// create the Material for it to use
 		Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		System.out.println("material created");
+		//System.out.println("material created");
 
 		// find file
-		File tileFile = new File(localTileCache.toString()+"/"+TileUtils.generateCachePath(TileUtils.GOOGLE_KEY, tile));
+		File tileFile = new File(localTileCache.toString()+"/"+TileUtils.generateCachePath(TileUtils.OSM_KEY, tile));
 		if(!tileFile.exists()){
 			try {
-				System.out.println("downloading tile");
-				HTTPDownloader.download(new URL(TileUtils.generateGoogleTileRequest(tile)), tileFile, null, null);
+				//System.out.println("downloading tile");
+				HTTPDownloader.download(new URL(TileUtils.generateOSMTileRequest(tile)), tileFile, null, null);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -125,11 +123,12 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 
 
 
-		Texture texture = assetManager.loadTexture(TileUtils.generateCachePath(TileUtils.GOOGLE_KEY, tile));
-		System.out.println("texture loaded");
+		Texture texture = assetManager.loadTexture(TileUtils.generateCachePath(TileUtils.OSM_KEY, tile));
+		//System.out.println("texture loaded");
 		material.setTexture("ColorMap", texture);
 		terrainQuad.setMaterial(material);
 		
+		// Force the cleansing of unused buffers
 		System.gc();
 
 		// return the TerrainQuad
@@ -197,4 +196,5 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 	public int getZoom() {
 		return zoom;
 	}
+	
 }

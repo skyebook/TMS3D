@@ -13,6 +13,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
+import com.jme3.system.AppSettings;
 import com.jme3.terrain.geomipmap.TerrainGrid;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.lodcalc.DistanceLodCalculator;
@@ -65,7 +66,7 @@ public class TestGridLoader extends SimpleApplication {
 		flyCam.setMoveSpeed(1000f);
 		double lat = 40.699667;
 		double lon = -74.014229;
-		TMSGridTileLoader tms = new TMSGridTileLoader(assetManager, 9, lat, lon);
+		TMSGridTileLoader tms = new TMSGridTileLoader(assetManager, 17, lat, lon);
 		tms.setPatchSize(65);
 		tms.setQuadSize(257);
 		terrain = new TerrainGrid("Grid", 65, 1025, tms);
@@ -110,7 +111,10 @@ public class TestGridLoader extends SimpleApplication {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		AppSettings settings = new AppSettings(true);
+		settings.setFrameRate(30);
 		TestGridLoader tgl = new TestGridLoader();
+		tgl.setSettings(settings);
 		tgl.start();
 	}
 
