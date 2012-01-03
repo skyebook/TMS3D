@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.font.BitmapText;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
@@ -23,6 +24,8 @@ import com.jme3.terrain.geomipmap.lodcalc.DistanceLodCalculator;
  *
  */
 public class TestGridLoader extends SimpleApplication {
+	
+	private static final Logger logger = Logger.getLogger(TestGridLoader.class.getName());
 
 	private TerrainGrid terrain;
 	private long last = -1;
@@ -30,17 +33,29 @@ public class TestGridLoader extends SimpleApplication {
 	private GLConverter converter;
 	
 	private Geometry groundBox;
+	
+	private BitmapText latLonDisplay;
 
 	/**
 	 * 
 	 */
 	public TestGridLoader() {}
+	
+	private void setupLatLonDisplay(){
+		latLonDisplay = new BitmapText(guiFont, false);
+		latLonDisplay.setLocalTranslation(0, fpsText.getLineHeight()*2, 0);
+		latLonDisplay.setText("Location Display NOT_STARTED");
+        guiNode.attachChild(latLonDisplay);
+	}
 
 	/* (non-Javadoc)
 	 * @see com.jme3.app.SimpleApplication#simpleInitApp()
 	 */
 	@Override
 	public void simpleInitApp() {
+		setupLatLonDisplay();
+		setDisplayStatView(false);
+		
 		cam.setFrustumPerspective(45, (float)cam.getWidth()/cam.getHeight(), 1f, 10000);
 		
 		Logger.getLogger("com.jme3").setLevel(Level.SEVERE);
@@ -107,14 +122,16 @@ public class TestGridLoader extends SimpleApplication {
 	@Override
 	public void simpleUpdate(final float tpf) {
 		if(System.currentTimeMillis()-last>1000){
-			System.out.println("--\tSTART CONVERSION\t--");
+			logger.fine("--\tSTART CONVERSION\t--");
 			double[] location = converter.getPosition(cam.getLocation());
-			System.out.println("you are at "+location[0]+", "+location[1]);
+			logger.info("you are at "+location[0]+", "+location[1]);
+			
+			latLonDisplay.setText(location[0]+"\t"+location[1]);
 			
 			groundBox.setLocalTranslation(cam.getLocation().x, 0, cam.getLocation().z);
 			
 			last = System.currentTimeMillis();
-			System.out.println("--\tEND CONVERSION\t--");
+			logger.fine("--\tEND CONVERSION\t--");
 		}
 	}
 
