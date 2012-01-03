@@ -67,79 +67,30 @@ public class GLConverter {
 		zoom = tms.getZoom();
 	}
 
-	private double[] alt(Vector3f location){
-		int cellX = (int)FastMath.floor(location.x/tms.getQuadSize());
-		int cellY = (int)FastMath.floor(location.z/tms.getQuadSize());
+	public double[] getPosition(Vector3f location){
+		int usableQuadSize = tms.getQuadSize()-1;
 
-		float startX = cellX*tms.getQuadSize();
-		float startY = cellY*tms.getQuadSize();
+		int cellX = (int)FastMath.floor(location.x/usableQuadSize);
+		int cellY = (int)FastMath.floor(location.z/usableQuadSize);
+
+		// increment both of the cells
+		//cellX+=1;
+		//cellY+=1;
+
+		System.out.println("Looks like you're in: " + cellX+", "+cellY);
+
+		float startX = cellX*usableQuadSize;
+		float startY = cellY*usableQuadSize;
 
 		System.out.println("CAMERA AT "+location);
 		System.out.println("TILE AT "+startX+", "+startY);
 
-		float endX = startX + tms.getQuadSize();
-		float endY = startY + tms.getQuadSize();
+		float endX = startX + usableQuadSize;
+		float endY = startY + usableQuadSize;
 
-		startBox.setLocalTranslation(startX, 0, startY);
-		endBox.setLocalTranslation(endX, 0, endY);
+		System.out.println("endX: " + endX);
 
-		// localize it
-		float localX = location.x - startX;
-		float localY = location.z - startX;
-
-		float percentX = localX/(float)tms.getQuadSize();
-		float percentY = localY/(float)tms.getQuadSize();
-
-		System.out.println("Camera is "  + percentX + " of X and " + percentY + " of Y");
-
-		Tile tile = new Tile();
-		tile.setX(originX+cellX+1);
-		tile.setY(originY+cellY);
-		tile.setZoom(zoom);
-
-		BoundingBox tileBoundingBox = TileUtils.tile2boundingBox(tile);
-		
-		System.out.println("Inside of " + tileBoundingBox);
-
-		double latStride = tileBoundingBox.getNorth()-tileBoundingBox.getSouth();
-		double lonStride = tileBoundingBox.getEast()-tileBoundingBox.getWest();
-		
-		System.out.println("latStride\t"+latStride);
-		System.out.println("lonStride\t"+lonStride);
-
-		double lat = tileBoundingBox.getSouth()-(latStride*percentY);
-		double lon = tileBoundingBox.getWest()+(lonStride*percentX);
-
-		return new double[]{lat, lon};
-	}
-
-	public double[] getPosition(Vector3f location){
-		if(true){
-			return alt(location);
-		}
-		
-		Vector3f terrainCell = terrain.getCamCell(location);
-
-		System.out.println("Terrain Cell " + terrainCell.toString());
-
-		int cellX = (int)FastMath.floor(location.x/tms.getQuadSize());
-		int cellY = (int)FastMath.floor(location.z/tms.getQuadSize());
-
-		System.out.println("I came up with "+cellX+", "+cellY);
-
-
-		Vector3f worldPositionOfTile = new Vector3f();
-		worldPositionOfTile.x=(terrainCell.getX()*tms.getQuadSize());
-		worldPositionOfTile.z=(terrainCell.getZ()*tms.getQuadSize());
-
-		float startX = worldPositionOfTile.x;
-		float startY = worldPositionOfTile.z;
-
-		System.out.println("CAMERA AT "+location);
-		System.out.println("TILE AT "+worldPositionOfTile);
-
-		float endX = startX + tms.getQuadSize();
-		float endY = startY + tms.getQuadSize();
+		//System.out.println("GL Stride: "+(endX-startX)+", "+(endY-startY));
 
 		startBox.setLocalTranslation(startX, 0, startY);
 		endBox.setLocalTranslation(endX, 0, endY);
@@ -148,20 +99,28 @@ public class GLConverter {
 		float localX = location.x - startX;
 		float localY = location.z - startY;
 
-		float percentX = localX/(float)tms.getQuadSize();
-		float percentY = localY/(float)tms.getQuadSize();
+		float percentX = localX/(float)usableQuadSize;
+		float percentY = localY/(float)usableQuadSize;
+
+		//percentX*=-1;
+		//percentY*=-1;
 
 		System.out.println("Camera is "  + percentX + " of X and " + percentY + " of Y");
 
 		Tile tile = new Tile();
-		tile.setX(originX+(int)terrainCell.x);
-		tile.setY(originY+(((int)terrainCell.z)*-1));
+		tile.setX(originX+cellX);
+		tile.setY(originY+cellY);
 		tile.setZoom(zoom);
 
 		BoundingBox tileBoundingBox = TileUtils.tile2boundingBox(tile);
 
+		System.out.println("Inside of " + tileBoundingBox);
+
 		double latStride = tileBoundingBox.getNorth()-tileBoundingBox.getSouth();
 		double lonStride = tileBoundingBox.getEast()-tileBoundingBox.getWest();
+
+		System.out.println("latStride\t"+latStride);
+		System.out.println("lonStride\t"+lonStride);
 
 		double lat = tileBoundingBox.getSouth()+(latStride*percentY);
 		double lon = tileBoundingBox.getWest()+(lonStride*percentX);
