@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import net.skyebook.tms3d.HTTPDownloader.DownloadCompleteCallback;
+
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.export.JmeExporter;
@@ -33,7 +35,7 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 	private int zoom;
 
 	private File localTileCache;
-	
+
 	int counter = 0;
 
 	/**
@@ -50,9 +52,10 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 
 		localTileCache = new File("tiles/");
 		localTileCache.mkdirs();
-		
+
 		// register the tile server
 		assetManager.registerLocator("tiles/", FileLocator.class);
+		assetManager.registerLocator("data/", FileLocator.class);
 	}
 
 	/* (non-Javadoc)
@@ -80,7 +83,7 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 	public TerrainQuad getTerrainQuadAt(Vector3f location) {
 		System.out.println("Requesting TerrainQuad for " + location.toString());
 
-		Tile tile = new Tile();
+		final Tile tile = new Tile();
 		tile.setZoom(zoom);
 		//tile.setX(startingX+(((int)(location.getX()/tileSize))+location.getX()>0?1:-1));
 		//tile.setY(startingY+(((int)(location.getZ()/tileSize))+location.getZ()>0?1:-1));
@@ -88,36 +91,48 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 		tile.setY(startingY+(int)location.getZ());
 
 		// create the TerrainQuad
-		TerrainQuad terrainQuad = new TerrainQuad(tile.getZoom()+"/"+tile.getX()+"/"+tile.getZoom(), patchSize, tileSize, null);
+		final TerrainQuad terrainQuad = new TerrainQuad(tile.getZoom()+"/"+tile.getX()+"/"+tile.getZoom(), patchSize, tileSize, null);
 		terrainQuad.setLocked(true);
 
 		//System.out.println("terrain quad created");
 
 		// create the Material for it to use
-		Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		final Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		Texture texture = null;
 		//System.out.println("material created");
 
 		// find file
-		File tileFile = new File(localTileCache.toString()+"/"+TileUtils.generateCachePath(TileUtils.OSM_KEY, tile));
+		File tileFile = new File(localTileCache.toString()+"/"+TileUtils.generateCachePath(TileUtils.GOOGLE_KEY, tile));
 		if(!tileFile.exists()){
 			try {
+				// Use a default tile
+				//texture = assetManager.loadTexture("blank_tile.png");
+				
+				
 				//System.out.println("downloading tile");
-				HTTPDownloader.download(new URL(TileUtils.generateOSMTileRequest(tile)), tileFile, null, null);
+				HTTPDownloader.download(new URL(TileUtils.generateGoogleTileRequest(tile)), tileFile, null, new DownloadCompleteCallback() {
+
+					@Override
+					public void downloadComplete(URL originalURL, File fileLocation,
+							long timeToDownload) {
+						//Texture texture = assetManager.loadTexture(TileUtils.generateCachePath(TileUtils.OSM_KEY, tile));
+						//System.out.println("texture loaded");
+						//material.setTexture("ColorMap", texture);
+						//terrainQuad.setMaterial(material);
+					}
+				});
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 		else{
-			//System.out.println("TILE ALREADY EXISTS");
+			texture = assetManager.loadTexture(TileUtils.generateCachePath(TileUtils.GOOGLE_KEY, tile));
+			
 		}
 
-
-
-		Texture texture = assetManager.loadTexture(TileUtils.generateCachePath(TileUtils.OSM_KEY, tile));
-		//System.out.println("texture loaded");
 		material.setTexture("ColorMap", texture);
 		terrainQuad.setMaterial(material);
-		
+
 		// Force the cleansing of unused buffers
 		System.gc();
 
@@ -186,5 +201,5 @@ public class TMSGridTileLoader implements TerrainGridTileLoader {
 	public int getZoom() {
 		return zoom;
 	}
-	
+
 }
